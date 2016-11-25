@@ -10,11 +10,16 @@ contract FitBlitz {
         //Can't think of anything that needs to be done as this contract is created.
     } 
     
-    function BeginExercise( address trainee, address charity ,uint startTime, uint duration, uint exerciseGoal  ){
+    function BeginExercise( address trainee, address charity, uint duration, uint exerciseGoal ){
         //Probably don't need a whole bunch of parameters in the function. 
 		//Could store these to some "exercise"-object.
 		
+		//The user pushes a button on the cell phone (or the watch) and that begins the exercise.
+		//The user gives the length of the exercise they are going to do by using the interface on the phone (possibly on the watch, as well).
+		
         //The details of the bid need to be saved to a collection.
+		
+		//Could probably get the time that the exercise begins from the message.
     }
     
     function CollectReward(address trainee){
