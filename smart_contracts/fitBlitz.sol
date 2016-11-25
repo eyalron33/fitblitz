@@ -4,10 +4,13 @@ pragma solidity ^0.4.0;
 
 contract FitBlitz {
     
-    
-    
+	//mapping(address => exercise) public exercises;
+	//TODO: Actually code the exercise-object.
+	//Maybe not an object, but a token? Can I have attributes and/or variables on tokens?
+	//From what I understood, tokens are the way to go: https://www.ethereum.org/crowdsale
+	
     function FitBlitz() {
-        //Can't think of anything that needs to be done as this contract is created.
+        //Can't think of anything that needs to be done when this contract is created.
     } 
     
     function BeginExercise( address trainee, address charity, uint duration, uint exerciseGoal ){
