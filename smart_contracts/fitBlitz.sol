@@ -14,10 +14,8 @@ contract FitBlitz {
     } 
     
     function BeginExercise( address trainee, address charity, uint duration, uint exerciseGoal ){
-	
-		exercise
-        //Probably don't need a whole bunch of parameters in the function. 
-		//Could store these to some "exercise"-object.
+		
+		var newExercise = exercise(trainee,charity, duration, exerciseGoal );
 		
 		//The user pushes a button on the cell phone (or the watch) and that begins the exercise.
 		//The user gives the length of the exercise they are going to do by using the interface on the phone (possibly on the watch, as well).
@@ -38,9 +36,7 @@ contract FitBlitz {
 		//Then it figures out if the bid was succesful, and sends money accordingly.
 		
     }
-}
-
-struct exercise {
+    struct exercise {
 //Reminder on how to use structs: 
 //fooStruct myStruct = fooStruct({foo:1, fighter:2});
 
@@ -59,3 +55,5 @@ struct exercise {
 	
 	}*/
 }
+}
+
