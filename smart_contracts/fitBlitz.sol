@@ -2,18 +2,20 @@ pragma solidity ^0.4.0;
 
 ///Created by Lauri Johannes Miettinen in fall 2016.
 
+//Screw you, Notepad, for messing with my indentations...
+
 contract FitBlitz {
     
-	//mapping(address => exercise) public exercises;
+	mapping(address => exercise) public exercises;
 	//TODO: Actually code the exercise-object.
-	//Maybe not an object, but a token? Can I have attributes and/or variables on tokens?
-	//From what I understood, tokens are the way to go: https://www.ethereum.org/crowdsale
 	
     function FitBlitz() {
         //Can't think of anything that needs to be done when this contract is created.
     } 
     
     function BeginExercise( address trainee, address charity, uint duration, uint exerciseGoal ){
+	
+		exercise
         //Probably don't need a whole bunch of parameters in the function. 
 		//Could store these to some "exercise"-object.
 		
@@ -36,7 +38,24 @@ contract FitBlitz {
 		//Then it figures out if the bid was succesful, and sends money accordingly.
 		
     }
-    
-    
-    
+}
+
+struct exercise {
+//Reminder on how to use structs: 
+//fooStruct myStruct = fooStruct({foo:1, fighter:2});
+
+	address trainee;
+	address charity;
+	uint duration;
+	uint exerciseGoal;
+	
+	/*
+	//I take it that this sort of constructor is pointless?
+	function exercise ( address _trainee, address _charity, uint _duration, uint _exerciseGoal ){
+		this.trainee = _trainee;
+		this.charity=_charity;
+		this.duration=_duration;
+		this.exerciseGoal=_exerciseGoal;
+	
+	}*/
 }
