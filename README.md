@@ -1,2 +1,0 @@
-# fitblitz
-Pebble meets blockchain
