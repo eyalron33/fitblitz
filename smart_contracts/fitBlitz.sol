@@ -15,7 +15,9 @@ contract FitBlitz {
     
     function BeginExercise( address trainee, address charity, uint duration, uint exerciseGoal ){
 		
-		var newExercise = exercise(trainee,charity, duration, exerciseGoal );
+		var newExercise = exercise(trainee,charity, duration, exerciseGoal, msg.amount );
+		//I hate this monstrous struct. Would rather split it into two: wager and activity.
+		
 		
 		//The user pushes a button on the cell phone (or the watch) and that begins the exercise.
 		//The user gives the length of the exercise they are going to do by using the interface on the phone (possibly on the watch, as well).
@@ -34,8 +36,27 @@ contract FitBlitz {
 		
 		//This function gets the details of the bid from the collection of bids.
 		//Then it figures out if the bid was succesful, and sends money accordingly.
+		exercise foundExercise = exercises(trainee);
+		
+		if (!foundExercise){
+		    return;
+	    	//If the given trainee hasn't started an exercise, quit this function.
+		}
+		
+		if(beatDeadline) {
+		    //TODO: A function that returns boolean on whether the deadline was beat.
+		    //Maybe first just make it so it returns all or sends all. 
+		    //Later make it so it returns a percentage based on how much of the exercise was beat. 
+		    
+		    trainee.send(foundExercise.wagerInWei);
+		} else {
+		    charity.send();
+		}
 		
     }
+
+
+    
     struct exercise {
 //Reminder on how to use structs: 
 //fooStruct myStruct = fooStruct({foo:1, fighter:2});
@@ -43,7 +64,8 @@ contract FitBlitz {
 	address trainee;
 	address charity;
 	uint duration;
-	uint exerciseGoal;
+	uint activityGoal;
+	uint wagerInWei;
 	
 	/*
 	//I take it that this sort of constructor is pointless?
@@ -54,6 +76,6 @@ contract FitBlitz {
 		this.exerciseGoal=_exerciseGoal;
 	
 	}*/
-}
+    }
 }
 
