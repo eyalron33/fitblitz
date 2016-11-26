@@ -1,4 +1,4 @@
-pragma solidity ^0.4.0;
+pragma solidity ^0.4.2;
 
 ///Created by Lauri Johannes Miettinen in fall 2016.
 
@@ -7,10 +7,8 @@ pragma solidity ^0.4.0;
 contract FitBlitz {
     
 	mapping(address => Exercise) private exercises;
-
-	//Needed to split wagers and exercise into two
 	
-	event ExerciseBegun(address trainee, address charity, uint startTime, uint targetDurationInMinutes );
+	event ExerciseBegun(address trainee, address charity, uint donation, uint startTime, uint targetDurationInMinutes );
 		
 	event ExerciseSuccessful(address trainee, address charity, uint donation, uint targetDuration, uint measuredDuration);
     event ExerciseFailed(string reason, address trainee, address charity, uint donation, uint targetDuration, uint measuredDuration);
@@ -27,8 +25,9 @@ contract FitBlitz {
 		
 		//Activity goal is not yet used.
 		address trainee = msg.sender;
+		uint donation = msg.value;
 		
-		exercises[msg.sender] = Exercise(trainee, _charity, _startTime, _targetDurationInMinutes, msg.value, true  );
+		exercises[msg.sender] = Exercise(trainee, _charity, _startTime, _targetDurationInMinutes, donation, true  );
 		//I hate this monstrous struct. Would rather split it into two: wager and targetActivity.
 		
 		//The user pushes a button on the cell phone (or the watch) and that begins the exercise.
@@ -38,10 +37,10 @@ contract FitBlitz {
 		
 		//Could probably get the time that the exercise begins from the message.
 		
-		ExerciseBegun(trainee,  _charity,  _startTime,  _targetDurationInMinutes );
+		ExerciseBegun(trainee,  _charity, donation,  _startTime,  _targetDurationInMinutes );
     }
     
-    function EvaluateExercise(uint endTime, uint measuredActivity) returns (bool){
+    function EvaluateExercise(uint endTime) returns (bool){
         //Returns on whether the exercise was successful. If it was, the trainee's money is returned.
         
     	address trainee = msg.sender;
