@@ -7,20 +7,29 @@ pragma solidity ^0.4.0;
 contract FitBlitz {
     
 	mapping(address => Exercise) public exercises;
+
+	//Needed to split wagers and exercise into two
+	
+	event ExerciseBegun(address trainee, address charity, uint startTime, uint targetDurationInMinutes, uint activityGoal );
+		
+	event ExerciseSuccessful(address trainee, address charity, uint donation, uint targetDuration, uint measuredDuration, uint activityGoal, uint measuredActivity);
+    event	ExerciseFailed(string reason, address trainee, address charity, uint donation, uint targetDuration, uint measuredDuration, uint activityGoal, uint measuredActivity);
+	
+    event ErrorOcurred(string reason);
+
+	
 	
     function FitBlitz() {
         //Can't think of anything that needs to be done when this contract is created.
-    } 
+    }
     
-    function BeginExercise( address trainee, address charity, uint startTime, uint targetDurationInMinutes, uint activityGoal ) payable {
+    function BeginExercise( address _trainee, address _charity, uint _startTime, uint _targetDurationInMinutes, uint _activityGoal ) payable {
 		
 		//Activity goal is not yet used.
 		
 		
-		exercises[msg.sender] = Exercise(trainee,charity, startTime, targetDurationInMinutes, activityGoal, msg.value, true  );
+		exercises[msg.sender] = Exercise(_trainee, _charity, _startTime, _targetDurationInMinutes, _activityGoal, msg.value, true  );
 		//I hate this monstrous struct. Would rather split it into two: wager and targetActivity.
-		
-    	 //trainee; charity; startTime; targetDuration;activityGoal; wagerInWei; onGoing;
 		
 		//The user pushes a button on the cell phone (or the watch) and that begins the exercise.
 		//The user gives the length of the exercise they are going to do by using the interface on the phone (possibly on the watch, as well).
@@ -28,9 +37,11 @@ contract FitBlitz {
         //The details of the bid need to be saved to a collection.
 		
 		//Could probably get the time that the exercise begins from the message.
+		
+		ExerciseBegun(_trainee,  _charity,  _startTime,  _targetDurationInMinutes,  _activityGoal );
     }
     
-    function ReturnWager(address trainee, uint endTime, uint measuredActivity) returns (bool){
+    function EvaluateExercise(address trainee, uint endTime, uint measuredActivity) returns (bool){
         //Returns on whether the exercise was successful. If it was, the trainee's money is returned.
         
         //Phone would have to poll this function. Not a problem because 
@@ -42,45 +53,50 @@ contract FitBlitz {
 		//This function gets the details of the bid from the collection of bids.
 		//Then it figures out if the bid was succesful, and sends money accordingly.
 		Exercise foundExercise = exercises[trainee];
+
 		
+			
 		if (foundExercise.onGoing=false){
-		    return;
+		
+			
+		    ErrorOcurred("havent-started-exercise");
+			return false;
 	    	//If the given trainee hasn't started an exercise, quit this function.
 	    	//I take it that foundExercise.onGoing defaults to 'false' when that trainee hasnt started an execise?
 		}
 		exercises[trainee].onGoing = false;
 		
-		uint wager = foundExercise.wagerInWei;
+		address charity=foundExercise.charity;
+		uint donation = foundExercise.donation;
+		uint targetDuration=foundExercise.targetDuration;
 		uint measuredDuration = endTime - foundExercise.startTime;
-		if( measuredDuration >= foundExercise.targetDuration ) {
-		    //TODO: A function that returns boolean on whether the deadline was beat.
-		    //Maybe first just make it so it returns all or sends all. 
+		uint activityGoal = foundExercise.activityGoal;
+		
+		if( measuredDuration >= targetDuration) {
+
+		    //At first, this function returns all or sends all. 
 		    //Later make it so it returns a percentage based on how much of the exercise was beat. 
 		    
-		    if (foundExercise.trainee.send(wager)){
+		    if (trainee.send(donation)) {
+		        
+		        ExerciseSuccessful( trainee, charity, donation, targetDuration, measuredDuration, activityGoal, measuredActivity);
+		        
 		        return true;
 		    }
-			
-		} else {
-            if (foundExercise.charity.send(wager)){
-                return false;
-            }
-		}
+		} 
+		
+        if (foundExercise.charity.send(donation)) {
+            
+		    ExerciseFailed( "didnt-meet-duration-goal",  trainee,  charity, donation, targetDuration, measuredDuration, activityGoal, measuredActivity);
+	
+            return false;
+        }
 		
 		
+		ErrorOcurred("non-existent-charity-address");
+		return false;
     }
 
-    
-    function ChallengeBeat(uint startTime, uint targetEndTime, uint exerciseDuration, uint targetActivity, uint measuredActivity) returns (bool){
-        //Current, crummy version takes in unused parameters. Only measures if the end of the exercise was after the 
-        
-        if (startTime - targetEndTime >= exerciseDuration) {
-            return true;
-        } 
-        return false;
-    }
-
-    
     struct Exercise {
         //Reminder on how to use structs: 
         //fooStruct myStruct = fooStruct({foo:1, fighter:2});
@@ -91,7 +107,7 @@ contract FitBlitz {
     	uint targetDuration;
     	
     	uint activityGoal;
-    	uint wagerInWei;
+    	uint donation;
     	
     	bool onGoing; //Is set to true when teh exercise starts. When it ends, is set to false.
     	/*
@@ -102,7 +118,8 @@ contract FitBlitz {
     		this.duration=_duration;
     		this.exerciseGoal=_exerciseGoal;
     	
-    	}*/
+    	}
+    	*/
     }
 }
 
