@@ -8,14 +8,18 @@ contract FitBlitz {
     
 	mapping(address => Exercise) public exercises;
 	
-	 event ExerciseBegun(address trainee, address charity, uint startTime, uint targetDurationInMinutes, uint activityGoal );
+	event ExerciseBegun(address trainee, address charity, uint startTime, uint targetDurationInMinutes, uint activityGoal );
 		
-	 event ExerciseEvaluated(address trainee, uint targetDuration, uint duration, uint activityGoal ,uint measuredActivity,bool successful);
+	event ExerciseSuccessful(address trainee, uint targetDuration, uint duration, uint activityGoal, uint measuredActivity, bool successful);
+	event ExerciseFailed(string reason, address trainee, uint targetDuration, uint duration, uint activityGoal, uint measuredActivity);
+	
+event ErrorOcurred(string reason);
 
+	
 	
     function FitBlitz() {
         //Can't think of anything that needs to be done when this contract is created.
-    } 
+    }
     
     function BeginExercise( address trainee, address charity, uint startTime, uint targetDurationInMinutes, uint activityGoal ) payable {
 		
@@ -33,6 +37,8 @@ contract FitBlitz {
         //The details of the bid need to be saved to a collection.
 		
 		//Could probably get the time that the exercise begins from the message.
+		
+		ExerciseBegun(trainee,  charity,  startTime,  targetDurationInMinutes,  activityGoal );
     }
     
     function EvaluateExercise(address trainee, uint endTime, uint measuredActivity) returns (bool){
@@ -49,7 +55,10 @@ contract FitBlitz {
 		Exercise foundExercise = exercises[trainee];
 		
 		if (foundExercise.onGoing=false){
-		    return false;
+		
+			//ExerciseEvaluated( trainee,  targetDuration,  duration,  activityGoal,  measuredActivity,  successful);
+		    
+			return false;
 	    	//If the given trainee hasn't started an exercise, quit this function.
 	    	//I take it that foundExercise.onGoing defaults to 'false' when that trainee hasnt started an execise?
 		}
@@ -64,13 +73,19 @@ contract FitBlitz {
 		    
 		    if (foundExercise.trainee.send(wager)){
 		        return true;
+				 //ExerciseEvaluated( trainee,  targetDuration,  duration,  activityGoal,  measuredActivity,  successful);
 		    }
 			
 		} else {
             if (foundExercise.charity.send(wager)){
+			
+			 //ExerciseEvaluated( trainee,  targetDuration,  duration,  activityGoal,  measuredActivity,  successful);
                 return false;
             }
 		}
+		
+		//ExerciseEvaluated( trainee,  targetDuration,  duration,  activityGoal,  measuredActivity,  successful);
+		return false;
     }
 
     struct Exercise {
