@@ -6,8 +6,7 @@ pragma solidity ^0.4.0;
 
 contract FitBlitz {
     
-	mapping(address => exercise) public exercises;
-	//TODO: Actually code the exercise-object.
+	mapping(address => Exercise) public exercises;
 	
     function FitBlitz() {
         //Can't think of anything that needs to be done when this contract is created.
@@ -15,7 +14,7 @@ contract FitBlitz {
     
     function BeginExercise( address trainee, address charity, uint duration, uint exerciseGoal ) payable {
 		
-		var newExercise = exercise(trainee,charity, duration, exerciseGoal, msg.amount );
+		var newExercise = Exercise(trainee,charity, duration, exerciseGoal, msg.value, true  );
 		//I hate this monstrous struct. Would rather split it into two: wager and activity.
 		
 		
@@ -36,40 +35,49 @@ contract FitBlitz {
 		
 		//This function gets the details of the bid from the collection of bids.
 		//Then it figures out if the bid was succesful, and sends money accordingly.
-		exercise foundExercise = exercises(trainee);
+		Exercise foundExercise = exercises[trainee];
 		
-		if (!foundExercise){
+		if (foundExercise.onGoing=false){
 		    return;
 	    	//If the given trainee hasn't started an exercise, quit this function.
+	    	//I take it that foundExercise.onGoing defaults to 'false' when that trainee hasnt started an execise?
 		}
 		
 		uint wager = foundExercise.wagerInWei;
 		
-		if(beatDeadline) {
+		if( BeatDeadline(foundExercise) ) {
 		    //TODO: A function that returns boolean on whether the deadline was beat.
 		    //Maybe first just make it so it returns all or sends all. 
 		    //Later make it so it returns a percentage based on how much of the exercise was beat. 
 		    
-		    trainee.send(wager);
+		    if (!trainee.send(wager)){
+		        throw;
+		    }
 			
 		} else {
-		    charity.send(wager);
+		     if (!foundExercise.charity.send(wager)){
+	           throw;
+		     }
 		}
 		
     }
 
-
+function BeatDeadline(Exercise exercise) returns (bool){
     
-    struct exercise {
+}
+    
+    struct Exercise {
 //Reminder on how to use structs: 
 //fooStruct myStruct = fooStruct({foo:1, fighter:2});
 
 	address trainee;
 	address charity;
+	
 	uint duration;
 	uint activityGoal;
 	uint wagerInWei;
 	
+	bool onGoing; //Is set to true when teh exercise starts. When it ends, is set to false.
 	/*
 	//I take it that this sort of constructor is pointless?
 	function exercise ( address _trainee, address _charity, uint _duration, uint _exerciseGoal ){
