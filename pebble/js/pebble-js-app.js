@@ -16,7 +16,7 @@ Pebble.addEventListener('appmessage',
 		pebble_data = JSON.stringify(e.payload);
 
 		var socket = io('http://monsters-neiman.rhcloud.com/');
-    socket.emit('pebble message', pebble_data);
+    socket.emit('pebble_to_server_message', pebble_data);
 
   }                     
 );
