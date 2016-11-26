@@ -10,10 +10,10 @@ contract FitBlitz {
 	
 	event ExerciseBegun(address trainee, address charity, uint startTime, uint targetDurationInMinutes, uint activityGoal );
 		
-	event ExerciseSuccessful(address trainee, uint targetDuration, uint duration, uint activityGoal, uint measuredActivity, bool successful);
-	event ExerciseFailed(string reason, address trainee, uint targetDuration, uint duration, uint activityGoal, uint measuredActivity);
+	event ExerciseSuccessful(address trainee, address charity, uint donation, uint targetDuration, uint measuredDuration, uint activityGoal, uint measuredActivity);
+	event ExerciseFailed(string reason, address trainee, uint donation, uint targetDuration, uint measuredDuration, uint activityGoal, uint measuredActivity);
 	
-event ErrorOcurred(string reason);
+    event ErrorOcurred(string reason);
 
 	
 	
@@ -41,7 +41,7 @@ event ErrorOcurred(string reason);
 		ExerciseBegun(trainee,  charity,  startTime,  targetDurationInMinutes,  activityGoal );
     }
     
-    function EvaluateExercise(address trainee, uint endTime, uint measuredActivity) returns (bool){
+    function EvaluateExercise(address _trainee, uint _endTime, uint _measuredActivity) returns (bool){
         //Returns on whether the exercise was successful. If it was, the trainee's money is returned.
         
         //Phone would have to poll this function. Not a problem because 
@@ -52,39 +52,48 @@ event ErrorOcurred(string reason);
 		
 		//This function gets the details of the bid from the collection of bids.
 		//Then it figures out if the bid was succesful, and sends money accordingly.
-		Exercise foundExercise = exercises[trainee];
+		Exercise foundExercise = exercises[_trainee];
 		
+			
 		if (foundExercise.onGoing=false){
 		
-			//ExerciseEvaluated( trainee,  targetDuration,  duration,  activityGoal,  measuredActivity,  successful);
-		    
+			
+		    ErrorOcurred("havent-started-exercise");
 			return false;
 	    	//If the given trainee hasn't started an exercise, quit this function.
 	    	//I take it that foundExercise.onGoing defaults to 'false' when that trainee hasnt started an execise?
 		}
-		exercises[trainee].onGoing = false;
+		exercises[_trainee].onGoing = false;
 		
-		uint wager = foundExercise.wagerInWei;
-		uint measuredDuration = endTime - foundExercise.startTime;
+		//This is tricky. Some values come from the exercises-collection, some come from the function parameters.
+		
+		uint donation = foundExercise.donationInWei;
+		uint measuredDuration = _endTime - foundExercise.startTime;
+		
 		if( measuredDuration >= foundExercise.targetDuration) {
-		    //TODO: A function that returns boolean on whether the deadline was beat.
-		    //Maybe first just make it so it returns all or sends all. 
+
+		    //At first, this function returns all or sends all. 
 		    //Later make it so it returns a percentage based on how much of the exercise was beat. 
 		    
-		    if (foundExercise.trainee.send(wager)){
+		    if (foundExercise.trainee.send(_donation)) {
+		        
+		        ExerciseSuccessful( _trainee, foundExercise.charity, _donation, foundExercise.targetDuration, _measuredDuration, foundExercise.activityGoal, _measuredActivity);
+		        
 		        return true;
-				 //ExerciseEvaluated( trainee,  targetDuration,  duration,  activityGoal,  measuredActivity,  successful);
+					 
 		    }
 			
-		} else {
-            if (foundExercise.charity.send(wager)){
-			
-			 //ExerciseEvaluated( trainee,  targetDuration,  duration,  activityGoal,  measuredActivity,  successful);
-                return false;
-            }
-		}
+		} 
 		
-		//ExerciseEvaluated( trainee,  targetDuration,  duration,  activityGoal,  measuredActivity,  successful);
+        if (foundExercise.charity.send(donation)) {
+            
+		    ExerciseFailed( "didnt-meet-duration-goal",  trainee, donation, foundExercise.targetDuration, measuredDuration, foundExercise.activityGoal, measuredActivity);
+
+            return false;
+        }
+		
+		
+		ErrorOcurred("non-existent-charity-address");
 		return false;
     }
 
@@ -98,7 +107,7 @@ event ErrorOcurred(string reason);
     	uint targetDuration;
     	
     	uint activityGoal;
-    	uint wagerInWei;
+    	uint donationInWei;
     	
     	bool onGoing; //Is set to true when teh exercise starts. When it ends, is set to false.
     	/*
