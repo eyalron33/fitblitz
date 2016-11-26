@@ -15,6 +15,10 @@ contract FitBlitz {
     event ExerciseFailed(string reason, address trainee, address charity, uint donation, uint targetDuration, uint measuredDuration);
 	
     event ErrorOcurred(string reason);
+	//TODO: Probably should have added an address, who caused the error.
+	//Better yet, should have made it so the error message is returned as a string.
+	//These events are broadcast to the whole blockchain. 
+	//Why does everyone in the world need to know that some dumbass fucked up?
 	
     function FitBlitz() {
         //Can't think of anything that needs to be done when this contract is created.
@@ -53,14 +57,15 @@ contract FitBlitz {
 		//This function gets the details of the bid from the collection of bids.
 		//Then it figures out if the bid was succesful, and sends money accordingly.
 		Exercise foundExercise = exercises[trainee];
-			
+		
+		/*
 		if ( foundExercise.trainee==0) {
 		    ErrorOcurred("havent-started-exercise");
 			return false;
 		}
-		
-		//Could probably put them on the same if-clause. 
-		//Might cause an error if it executes both. Not going to risk it.
+		//I surmise that this clause causes every single execution of the function to fail.
+		*/
+
 		
 		if (foundExercise.onGoing==false){
 		
