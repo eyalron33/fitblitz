@@ -12,11 +12,15 @@ contract FitBlitz {
         //Can't think of anything that needs to be done when this contract is created.
     } 
     
-    function BeginExercise( address trainee, address charity, uint duration, uint exerciseGoal ) payable {
+    function BeginExercise( address trainee, address charity, uint startTime, uint targetDurationInMinutes, uint activityGoal ) payable {
 		
-		var newExercise = Exercise(trainee,charity, duration, exerciseGoal, msg.value, true  );
-		//I hate this monstrous struct. Would rather split it into two: wager and activity.
+		//Activity goal is not yet used.
 		
+		
+		exercises[msg.sender] = Exercise(trainee,charity, startTime, targetDurationInMinutes, activityGoal, msg.value, true  );
+		//I hate this monstrous struct. Would rather split it into two: wager and targetActivity.
+		
+    	 //trainee; charity; startTime; targetDuration;activityGoal; wagerInWei; onGoing;
 		
 		//The user pushes a button on the cell phone (or the watch) and that begins the exercise.
 		//The user gives the length of the exercise they are going to do by using the interface on the phone (possibly on the watch, as well).
@@ -26,7 +30,9 @@ contract FitBlitz {
 		//Could probably get the time that the exercise begins from the message.
     }
     
-    function CollectReward(address trainee){
+    function ReturnWager(address trainee, uint endTime, uint measuredActivity) returns (bool){
+        //Returns on whether the exercise was successful. If it was, the trainee's money is returned.
+        
         //Phone would have to poll this function. Not a problem because 
         //the phone knows when the deadline is.
         //If the trainee was succesful, 
@@ -42,51 +48,61 @@ contract FitBlitz {
 	    	//If the given trainee hasn't started an exercise, quit this function.
 	    	//I take it that foundExercise.onGoing defaults to 'false' when that trainee hasnt started an execise?
 		}
+		exercises[trainee].onGoing = false;
 		
 		uint wager = foundExercise.wagerInWei;
-		
-		if( BeatDeadline(foundExercise) ) {
+		uint measuredDuration = endTime - foundExercise.startTime;
+		if( measuredDuration >= foundExercise.targetDuration ) {
 		    //TODO: A function that returns boolean on whether the deadline was beat.
 		    //Maybe first just make it so it returns all or sends all. 
 		    //Later make it so it returns a percentage based on how much of the exercise was beat. 
 		    
-		    if (!trainee.send(wager)){
-		        throw;
+		    if (foundExercise.trainee.send(wager)){
+		        return true;
 		    }
 			
 		} else {
-		     if (!foundExercise.charity.send(wager)){
-	           throw;
-		     }
+            if (foundExercise.charity.send(wager)){
+                return false;
+            }
 		}
+		
 		
     }
 
-function BeatDeadline(Exercise exercise) returns (bool){
     
-}
+    function ChallengeBeat(uint startTime, uint targetEndTime, uint exerciseDuration, uint targetActivity, uint measuredActivity) returns (bool){
+        //Current, crummy version takes in unused parameters. Only measures if the end of the exercise was after the 
+        
+        if (startTime - targetEndTime >= exerciseDuration) {
+            return true;
+        } 
+        return false;
+    }
+
     
     struct Exercise {
-//Reminder on how to use structs: 
-//fooStruct myStruct = fooStruct({foo:1, fighter:2});
-
-	address trainee;
-	address charity;
-	
-	uint duration;
-	uint activityGoal;
-	uint wagerInWei;
-	
-	bool onGoing; //Is set to true when teh exercise starts. When it ends, is set to false.
-	/*
-	//I take it that this sort of constructor is pointless?
-	function exercise ( address _trainee, address _charity, uint _duration, uint _exerciseGoal ){
-		this.trainee = _trainee;
-		this.charity=_charity;
-		this.duration=_duration;
-		this.exerciseGoal=_exerciseGoal;
-	
-	}*/
+        //Reminder on how to use structs: 
+        //fooStruct myStruct = fooStruct({foo:1, fighter:2});
+    
+    	address trainee;
+    	address charity;
+    	uint startTime;
+    	uint targetDuration;
+    	
+    	uint activityGoal;
+    	uint wagerInWei;
+    	
+    	bool onGoing; //Is set to true when teh exercise starts. When it ends, is set to false.
+    	/*
+    	//I take it that this sort of constructor is pointless?
+    	function exercise ( address _trainee, address _charity, uint _duration, uint _exerciseGoal ){
+    		this.trainee = _trainee;
+    		this.charity=_charity;
+    		this.duration=_duration;
+    		this.exerciseGoal=_exerciseGoal;
+    	
+    	}*/
     }
 }
 
