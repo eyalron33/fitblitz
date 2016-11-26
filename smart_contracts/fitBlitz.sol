@@ -13,7 +13,7 @@ contract FitBlitz {
         //Can't think of anything that needs to be done when this contract is created.
     } 
     
-    function BeginExercise( address trainee, address charity, uint duration, uint exerciseGoal ){
+    function BeginExercise( address trainee, address charity, uint duration, uint exerciseGoal ) payable {
 		
 		var newExercise = exercise(trainee,charity, duration, exerciseGoal, msg.amount );
 		//I hate this monstrous struct. Would rather split it into two: wager and activity.
@@ -43,14 +43,17 @@ contract FitBlitz {
 	    	//If the given trainee hasn't started an exercise, quit this function.
 		}
 		
+		uint wager = foundExercise.wagerInWei;
+		
 		if(beatDeadline) {
 		    //TODO: A function that returns boolean on whether the deadline was beat.
 		    //Maybe first just make it so it returns all or sends all. 
 		    //Later make it so it returns a percentage based on how much of the exercise was beat. 
 		    
-		    trainee.send(foundExercise.wagerInWei);
+		    trainee.send(wager);
+			
 		} else {
-		    charity.send();
+		    charity.send(wager);
 		}
 		
     }
