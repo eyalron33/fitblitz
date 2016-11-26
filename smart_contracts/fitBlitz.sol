@@ -11,11 +11,10 @@ contract FitBlitz {
 	event ExerciseBegun(address trainee, address charity, uint donation, uint startTime, uint targetDurationInMinutes );
 		
 	event ExerciseSuccessful(address trainee, address charity, uint donation, uint targetDuration, uint measuredDuration);
+    
     event ExerciseFailed(string reason, address trainee, address charity, uint donation, uint targetDuration, uint measuredDuration);
 	
     event ErrorOcurred(string reason);
-
-	
 	
     function FitBlitz() {
         //Can't think of anything that needs to be done when this contract is created.
@@ -55,7 +54,15 @@ contract FitBlitz {
 		//Then it figures out if the bid was succesful, and sends money accordingly.
 		Exercise foundExercise = exercises[trainee];
 			
-		if (foundExercise.onGoing=false){
+		if ( foundExercise.trainee==0) {
+		    ErrorOcurred("havent-started-exercise");
+			return false;
+		}
+		
+		//Could probably put them on the same if-clause. 
+		//Might cause an error if it executes both. Not going to risk it.
+		
+		if (foundExercise.onGoing==false){
 		
 		    ErrorOcurred("havent-started-exercise");
 			return false;
@@ -64,9 +71,9 @@ contract FitBlitz {
 		}
 		exercises[trainee].onGoing = false;
 		
-		address charity=foundExercise.charity;
+		address charity = foundExercise.charity;
 		uint donation = foundExercise.donation;
-		uint targetDuration=foundExercise.targetDuration;
+		uint targetDuration = foundExercise.targetDuration;
 		uint measuredDuration = endTime - foundExercise.startTime;
 		//uint activityGoal = foundExercise.activityGoal;
 		
@@ -89,7 +96,6 @@ contract FitBlitz {
 	
             return false;
         }
-		
 		
 		ErrorOcurred("non-existent-charity-address");
 		return false;
