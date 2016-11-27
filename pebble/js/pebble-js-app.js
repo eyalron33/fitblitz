@@ -15,7 +15,7 @@ Pebble.addEventListener('appmessage',
 		console.log('sending info to localhost: ' + accelerometerd);
 		pebble_data = JSON.stringify(e.payload);
 
-		var socket = io('http://monsters-neiman.rhcloud.com/');
+		var socket = io('https://young-mesa-30289.herokuapp.com/');
     socket.emit('pebble_to_server_message', pebble_data);
 
   }                     
