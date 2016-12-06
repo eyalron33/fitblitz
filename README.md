@@ -1,4 +1,4 @@
-# fitblitz
+# Fitblitz
 Pebble meets blockchain
 
 # Inspiration
