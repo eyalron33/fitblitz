@@ -28,3 +28,6 @@ The phone lets the user choose the amount of running time and money to invest in
 We wrote a smart contract to the blockchain using Solidity language. It first gets the conditions from the phone and locks the money. Once it gets information from Pebble on how much running you actually did, it either sends you the whole amount back, or pass some of it to charity.
 
 This smart contract, as all blockchain code, is immutable, and cannot be cheated.
+
+# Current State
+The project is an early development state. Please contact eyal@cryptom.eu if you would like to get involved or try out the current tech.
